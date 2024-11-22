@@ -1,9 +1,9 @@
-import { db } from '@/db/db'
+import { db } from '@/lib/db'
 import { Request, Response } from 'express';
 
 // Create a new employee
 export async function createEmployee(req: Request, res: Response) {
-    const { fname, onames, phone, email, state, city, address, imageUrl } = req.body;
+    const { fname, onames, phone, email, state, city, address } = req.body;
     try {
         const addEmployee = await db.employee.create({
             data: {
@@ -13,8 +13,7 @@ export async function createEmployee(req: Request, res: Response) {
                 email,
                 state,
                 city,
-                address,
-                imageUrl
+                address
             },
         })
 
@@ -51,7 +50,13 @@ export async function getEmployees(req: Request, res: Response) {
 
 // Get a employee by ID
 export async function getEmployee(req: Request, res: Response){
-    const employeeId = parseInt(req.params.id);
+    const employeeId = req.params.id;  // Use the ID as a string
+
+    if (!employeeId) {
+        return res.status(400).json({
+            message: "Employee ID is required",
+        });
+    }
     try {
         const employee = await db.employee.findUnique({
             where: {
@@ -70,8 +75,14 @@ export async function getEmployee(req: Request, res: Response){
 
 // Update a employee by ID
 export async function updateEmployee(req: Request, res: Response){
-    const employeeId = parseInt(req.params.id);
-    const { fname, onames, phone, email, state, city, address, imageUrl } = req.body;
+    const employeeId = req.params.id;  // Use the ID as a string
+
+    if (!employeeId) {
+        return res.status(400).json({
+            message: "Employee ID is required",
+        });
+    }
+    const { fname, onames, phone, email, state, city, address } = req.body;
     try {
         // check if employee already exist
         const existsEmployee = await db.employee.findUnique({
@@ -98,8 +109,7 @@ export async function updateEmployee(req: Request, res: Response){
                 email,
                 state,
                 city,
-                address,
-                imageUrl
+                address
             }
         })
 
@@ -116,7 +126,13 @@ export async function updateEmployee(req: Request, res: Response){
 
 // Delete a employee by ID
 export async function deleteEmployee(req: Request, res: Response){
-    const employeeId = parseInt(req.params.id);
+    const employeeId = req.params.id;  // Use the ID as a string
+
+    if (!employeeId) {
+        return res.status(400).json({
+            message: "Employee ID is required",
+        });
+    }
     try {
         // check if employee already exist
         const existsEmployee = await db.employee.findUnique({
@@ -145,5 +161,5 @@ export async function deleteEmployee(req: Request, res: Response){
             data: null,
             message: "Failed to delete employee",
         })
-    } 
+    }
 }
